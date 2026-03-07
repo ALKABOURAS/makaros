@@ -1,0 +1,27 @@
+<div class="sidebar-header">
+    <img src="/img/unipi-logo.png" alt="Unipi" class="side-logo">
+</div>
+
+<div class="user-info-card">
+    <div class="avatar-wrapper">
+        <img src="{{user.avatar_path}}" alt="Avatar">
+    </div>
+    <h4>{{user.fullName}}</h4>
+    <span class="am-text">{{user.am}}</span>
+</div>
+
+<nav class="side-menu">
+    <a href="/" class="nav-item">Αρχική</a>
+    <a href="/profile" class="nav-item">Προφίλ</a> <!-- Εδώ! -->
+{{#if (eq user.role "student")}}
+    <a href="/lessons" class="nav-item">Μαθήματα</a>
+{{/if}}
+    {{#if (eq user.role "professor")}}
+        <hr class="nav-divider">
+        <p class="nav-label">Διαχείριση</p>
+        <a href="/lessons/create" class="nav-item">➕ Νέο Μάθημα</a>
+        <a href="/lessons/my-lessons" class="nav-item">📝 Τα Μαθήματά μου</a>
+    {{/if}}
+</nav>
+
+<a href="/auth/logout" class="logout-link">Αποσύνδεση</a>

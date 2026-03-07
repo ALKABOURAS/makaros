@@ -1,0 +1,164 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+    color: #efefef;
+
+}
+
+.app-container {
+    display: grid;
+    /* Αριστερά 260px | Κέντρο όσο περισσεύει | Δεξιά 300px */
+    grid-template-columns: 260px 1fr 300px;
+    grid-template-rows: 100vh;
+    width: 100vw;
+    height: 100vh;
+    background-color: #121212;
+    overflow: hidden;
+}
+
+.sidebar-left {
+    background-color: #181818; /* Πρέπει να έχει χρώμα για να ξεχωρίζει */
+    border-right: 1px solid #2a2a2a;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-right {
+    background-color: #181818;
+    border-left: 1px solid #2a2a2a;
+    padding: 20px;
+}
+
+.user-info-card {
+    text-align: center;
+    margin: 40px 0;
+}
+
+.avatar-wrapper img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 2px solid #333;
+    object-fit: cover;
+}
+
+.main-content {
+    background-color: #121212;
+    overflow-y: auto; /* Μόνο το κέντρο θα σκρολάρει */
+    padding: 20px 40px;
+}
+
+.top-nav {
+    padding: 20px 0;
+    display: flex;
+    justify-content: space-between;
+    color: #888;
+    font-size: 0.9rem;
+}
+
+/* Τα περιεχόμενα του κέντρου (home.hbs) */
+.page-body {
+    padding-top: 20px;
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    padding: 20px;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 120px;
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover { transform: translateY(-5px); }
+
+/* Χρώματα από το Figma */
+.stat-card.blue { background-color: #dbeafe; color: #1e3a8a; }
+.stat-card.pink { background-color: #fce7f3; color: #831843; }
+.stat-card.purple { background-color: #ede9fe; color: #4c1d95; }
+.stat-card.yellow { background-color: #fef3c7; color: #78350f; }
+
+.stat-label { font-size: 0.85rem; font-weight: 500; opacity: 0.8; }
+
+.stat-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-top: 15px;
+}
+
+.stat-value { font-size: 1.8rem; font-weight: 700; }
+.stat-percent { font-size: 0.85rem; font-weight: 600; }
+.stat-percent.positive { color: #059669; }
+
+/* Containers για Γραφήματα */
+.chart-container {
+    background-color: #1a1a1a;
+    border-radius: 24px;
+    padding: 25px;
+    margin-bottom: 30px;
+    border: 1px solid #2a2a2a;
+}
+
+.chart-container h3 {
+    font-size: 1rem;
+    margin-bottom: 20px;
+    color: #efefef;
+}
+
+/* Mock Bar Chart */
+.bar-chart-mockup {
+    display: flex;
+    align-items: flex-end;
+    gap: 30px;
+    height: 150px;
+    padding-top: 20px;
+}
+
+.bar-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.bar {
+    width: 25px;
+    border-radius: 6px;
+    transition: height 1s ease-in-out;
+}
+
+.bar-item span { font-size: 10px; color: #888; text-align: center; }
+
+.logout-link {
+    margin-top: auto; /* Σπρώχνει το Logout τέρμα κάτω */
+    color: #ff5f5f;   /* Κόκκινο για αποσύνδεση */
+    font-weight: bold;
+    padding: 10px;
+    display: block;
+}
+
+.nav-item {
+    display: block;
+    padding: 12px;
+    margin: 5px 0;
+    border-radius: 8px;
+    color: #888;
+}
+
+.nav-item.active {
+    background-color: #2a2a2a;
+    color: white;
+}

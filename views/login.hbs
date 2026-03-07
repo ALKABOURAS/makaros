@@ -1,9 +1,34 @@
-<div class="login-container">
-    <h2>Είσοδος Χρήστη</h2>
-    <form action="/auth/login" method="POST">
-        <input type="email" name="email" placeholder="Email" required>
-        <input type="password" name="password" placeholder="Password" required>
-        <button type="submit">Είσοδος</button>
-    </form>
-    <p>Δεν έχετε λογαριασμό; <a href="/auth/signup">Εγγραφείτε εδώ</a></p>
+<div class="auth-wrapper">
+    <!-- Background Illustration (θα μπορούσε να είναι SVG ή IMG) -->
+    <div class="bg-illustration"></div>
+
+    <div class="auth-card">
+        <header class="auth-header">
+            <img src="/img/unipi-logo.png" alt="Unipi Logo" class="logo">
+            <div class="logo-text">
+                <span class="uni-name">ΠΑΝΕΠΙΣΤΗΜΙΟ ΠΕΙΡΑΙΩΣ</span>
+                <span class="uni-name-en">UNIVERSITY OF PIRAEUS</span>
+            </div>
+        </header>
+
+        <h2>Σύνδεση</h2>
+
+        <form action="/auth/login" method="POST" class="auth-form">
+            <div class="form-group">
+                <input type="email" name="email" placeholder="Email" required>
+            </div>
+
+            <div class="form-group">
+                <input type="password" name="password" placeholder="Κωδικός" required>
+            </div>
+
+            <a href="/auth/forgot" class="forgot-link">Ξέχασα τον κωδικό μου</a>
+
+            <button type="submit" class="btn-primary">Σύνδεση</button>
+        </form>
+
+        <footer class="auth-footer">
+            <span>Δεν έχετε λογαριασμό; <a href="/auth/signup">Εγγραφή</a></span>
+        </footer>
+    </div>
 </div>

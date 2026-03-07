@@ -1,22 +1,11 @@
 <!DOCTYPE html>
-<html lang="el">
+<html>
 <head>
-    <meta charset="UTF-8">
     <title>{{title}}</title>
     <link rel="stylesheet" href="/css/global.css">
-    {{#if style}}
-        <link rel="stylesheet" href="/css/{{style}}">
-    {{/if}}
+    {{#if style}}<link rel="stylesheet" href="/css/{{style}}">{{/if}}
 </head>
 <body>
-<nav>
-    <a href="/">Home</a> | <a href="/auth/login">Login</a> | <a href="/auth/signup">Signup</a>
-</nav>
-
 {{{body}}}
-
-<footer>
-    <p>&copy; 2023 Smart Algo Project - eClass</p>
-</footer>
 </body>
 </html>

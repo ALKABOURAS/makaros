@@ -1,0 +1,180 @@
+/* signup.css */
+/* ... (τα βασικά styles auth-container, illustration-bg, auth-card είναι ίδια με το login.css) ... */
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: #f0f4f8; /* Το χρώμα πίσω από το illustration */
+}
+
+.auth-card {
+    background-color: #1a1a1a;
+    width: 100%;
+    max-width: 420px;
+    padding: 40px;
+    border-radius: 24px;
+    color: white;
+    text-align: center;
+    position: relative; /* Απαραίτητο για να δουλέψει το z-index */
+    z-index: 10;        /* Πολύ μεγαλύτερο από το 1 της εικόνας */
+}
+
+.auth-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh; /* Ακριβώς όσο το ύψος της οθόνης */
+    display: flex;
+
+    /* Για το Signup το θέλουμε αριστερά, για το Login δεξιά */
+    justify-content: flex-start;
+    align-items: center;
+
+    /* Αντί για margin, βάζουμε padding για να "σπρώξουμε" το κουτί μέσα */
+    padding-left: 10vw;
+    box-sizing: border-box;
+}
+
+/* Κίνηση εισόδου: Έρχεται από δεξιά προς τα αριστερά */
+.auth-card {
+    animation: slideFromRight 0.8s ease-out;
+}
+
+@keyframes slideFromRight {
+    from {
+        opacity: 0;
+        transform: translateX(150px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.auth-title {
+    font-size: 24px;
+    margin-bottom: 30px;
+    font-weight: 600;
+}
+
+/* Password Strength Meter */
+.strength-meter {
+    display: flex;
+    gap: 5px;
+    margin-top: 8px;
+    margin-bottom: 5px;
+}
+
+.bar {
+    height: 3px;
+    flex: 1;
+    background-color: #333; /* Default γκρι χρώμα */
+    border-radius: 10px;
+}
+
+/* Hint Text */
+.input-hint {
+    font-size: 11px;
+    color: #888;
+    text-align: left;
+    margin-bottom: 15px;
+}
+
+/* Checkbox Styling */
+.terms-group {
+    text-align: left;
+    margin: 20px 0;
+    font-size: 13px;
+    color: #ccc;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.checkbox-container a {
+    color: #5a8fb3;
+    text-decoration: none;
+}
+
+/* Signup Button - Το μωβ/μπλε του Figma */
+.btn-submit-signup {
+    width: 100%;
+    background-color: #c2c2f0; /* Το απαλό μωβ από το screenshot */
+    color: #1a1a1a;
+    border: none;
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.3s;
+}
+
+.btn-submit-signup:hover {
+    background-color: #d1d1f5;
+    transform: translateY(-2px);
+}
+
+/* Inputs (ίδια με login για ομοιομορφία) */
+.input-group input {
+    width: 100%;
+    background: #2a2a2a;
+    border: 1px solid #333;
+    padding: 14px;
+    border-radius: 10px;
+    color: white;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+.login-link {
+    color: #5a8fb3;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.illustration-bg {
+    background-image: url('/img/background-vector.svg'); /* Το vector από το Figma */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
+}
+
+.btn-submit, .btn-submit-signup {
+    transition: all 0.3s ease;
+}
+
+.btn-submit:hover {
+    letter-spacing: 1px;
+    filter: brightness(1.1);
+    cursor: pointer;
+}
+
+.strength-meter {
+    display: flex;
+    gap: 5px;
+    margin: 10px 0;
+    height: 4px; /* Πολύ λεπτές γραμμές όπως στο Figma */
+}
+
+.bar {
+    flex: 1;
+    background-color: #333; /* Αρχικό γκρι */
+    border-radius: 2px;
+    transition: background-color 0.3s ease;
+}
+
+/* Χρώματα δυναμικά από το JS */
+.bar.weak { background-color: #ff4d4d; }
+.bar.medium { background-color: #ffa500; }
+.bar.strong { background-color: #beff33; }
+.bar.excellent { background-color: #00ff88; }

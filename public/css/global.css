@@ -1,0 +1,75 @@
+/* Κοινό στυλ για την κάρτα και στις δύο σελίδες */
+
+
+.auth-card {
+    position: relative;
+    z-index: 10;
+    background-color: rgba(26, 26, 26, 0.95); /* Λίγο transparency για στυλ */
+
+    /* Δυναμικό πλάτος: 90% της οθόνης αλλά max 400px */
+    width: 90%;
+    max-width: 400px;
+
+    /* Δυναμικό ύψος: max 90% του ύψους της οθόνης */
+    max-height: 90vh;
+
+    padding: 2rem;
+    border-radius: 24px;
+    box-sizing: border-box;
+
+    /* Αν η οθόνη είναι πολύ μικρή (π.χ. κινητό πλάγια),
+       το κουτί θα αποκτήσει εσωτερικό scroll αντί να χαλάσει η σελίδα */
+    overflow-y: auto;
+
+    /* Hover effect */
+    transition: transform 0.3s ease;
+}
+
+/* Media Query για μικρές οθόνες (Κινητά) */
+@media (max-width: 768px) {
+    .auth-container {
+        justify-content: center; /* Στο κινητό το θέλουμε κέντρο */
+        padding-left: 0;
+    }
+
+    .auth-card {
+        padding: 1.5rem;
+    }
+}
+
+/* Εφέ όταν ο χρήστης ακουμπάει την κάρτα */
+.auth-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Εξαφανίζει το scroll όλης της σελίδας */
+}
+
+/*nav {*/
+/*    position: absolute;*/
+/*    top: 0;*/
+/*    left: 0;*/
+/*    width: 100%;*/
+/*    z-index: 100;*/
+/*    padding: 10px 20px;*/
+/*}*/
+
+/*footer {*/
+/*    position: absolute;*/
+/*    bottom: 0;*/
+/*    left: 0;*/
+/*    width: 100%;*/
+/*    z-index: 100;*/
+/*    padding: 10px 20px;*/
+/*    text-align: center;*/
+/*}*/
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #121212; }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #444; }

@@ -1,0 +1,56 @@
+<div class="auth-container">
+    <div class="illustration-bg"></div>
+
+    <div class="auth-card">
+        <header class="card-header">
+            <img src="/img/unipi-logo.png" alt="Unipi Logo" class="logo">
+            <div class="logo-text">
+                <span class="uni-name">ΠΑΝΕΠΙΣΤΗΜΙΟ ΠΕΙΡΑΙΩΣ</span>
+                <span class="uni-name-en">UNIVERSITY OF PIRAEUS</span>
+            </div>
+        </header>
+
+        <h2 class="auth-title">Εγγραφή</h2>
+        {{#if error}}
+            <div class="error-message" style="color: #ff4d4d; margin-bottom: 15px; font-size: 14px;">
+                {{error}}
+            </div>
+        {{/if}}
+        <form action="/auth/signup" method="POST" class="auth-form">
+            <div class="input-group">
+                <input type="email" name="email" placeholder="Email" required>
+            </div>
+
+            <div class="input-group">
+                <input type="password" name="password" id="passwordInput" placeholder="Κωδικός" minlength="8" required>
+                <!-- Password Strength Bars -->
+                <div class="strength-meter">
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                </div>
+                <p class="input-hint">Ο κωδικός πρέπει να περιλαμβάνει τουλάχιστον 8 χαρακτήρες</p>
+            </div>
+
+            <div class="input-group">
+                <input type="password" name="confirmPassword" placeholder="Επανάληψη Κωδικού" required>
+            </div>
+
+            <div class="form-options terms-group">
+                <label class="checkbox-container">
+                    <input type="checkbox" name="terms" required>
+                    <span class="checkmark"></span>
+                    Αποδέχομαι τους <a href="#">Όρους</a>
+                </label>
+            </div>
+
+            <button type="submit" class="btn-submit-signup">Εγγραφή</button>
+        </form>
+
+        <div class="card-footer">
+            <span>Έχω ήδη λογαριασμό <a href="/auth/login" class="login-link">Σύνδεση</a></span>
+        </div>
+    </div>
+</div>
+<script src="/js/signup-logic.js"></script>

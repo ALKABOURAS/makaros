@@ -1,0 +1,18 @@
+<div class="notifications-section">
+    <h5>Ειδοποιήσεις</h5>
+    <!-- Εδώ θα έμπαινε ένα loop ειδοποιήσεων -->
+    <div class="notif-item">Ολοκλήρωσες ένα μάθημα</div>
+</div>
+
+<div class="courses-section">
+    <h5>Μαθήματα</h5>
+    {{#each courses}}
+        <div class="course-mini-card">
+            <img src="/img/{{this.icon}}" alt="">
+            <div class="course-info">
+                <h6>{{this.title}}</h6>
+                <span>{{this.progress}}</span>
+            </div>
+        </div>
+    {{/each}}
+</div>

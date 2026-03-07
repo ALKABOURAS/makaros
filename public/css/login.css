@@ -1,0 +1,144 @@
+/* Styling βασισμένο στο Figma */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: #f0f4f8; /* Το χρώμα πίσω από το illustration */
+}
+
+.auth-wrapper {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Η κάρτα του Login */
+.auth-card {
+    background: #1a1a1a; /* Dark background από το Figma */
+    width: 100%;
+    max-width: 400px;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    z-index: 2;
+    color: white;
+    text-align: center;
+}
+
+.auth-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.logo { width: 50px; }
+
+.logo-text {
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    font-size: 0.7rem;
+    border-left: 1px solid #444;
+    padding-left: 10px;
+}
+
+/* Inputs */
+.auth-form .form-group {
+    margin-bottom: 15px;
+}
+
+.auth-form input {
+    width: 100%;
+    padding: 12px 15px;
+    background: #2b2b2b; /* Πιο ανοιχτό μαύρο για τα inputs */
+    border: 1px solid #3d3d3d;
+    border-radius: 8px;
+    color: white;
+    box-sizing: border-box;
+}
+
+/* Buttons */
+.btn-primary {
+    width: 100%;
+    padding: 12px;
+    background-color: #ffffff; /* Λευκό button όπως στο Figma Login */
+    color: #1a1a1a;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #e0e0e0;
+}
+
+.forgot-link {
+    display: block;
+    text-align: right;
+    font-size: 0.8rem;
+    color: #888;
+    text-decoration: none;
+    margin-top: -10px;
+}
+
+/* Background Illustration */
+.bg-illustration {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('/img/background-vector.svg'); /* Το vector από το Figma */
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
+}
+
+.auth-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh; /* Ακριβώς όσο το ύψος της οθόνης */
+    display: flex;
+
+    /* Για το Signup το θέλουμε αριστερά, για το Login δεξιά */
+    justify-content: flex-start;
+    align-items: center;
+
+    /* Αντί για margin, βάζουμε padding για να "σπρώξουμε" το κουτί μέσα */
+    padding-left: 10vw;
+    box-sizing: border-box;
+}
+
+/* Κίνηση εισόδου: Έρχεται από αριστερά προς τα δεξιά */
+.auth-card {
+    animation: slideFromLeft 0.8s ease-out;
+}
+
+@keyframes slideFromLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-150px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.btn-submit, .btn-submit-signup {
+    transition: all 0.3s ease;
+}
+
+.btn-submit:hover {
+    letter-spacing: 1px;
+    filter: brightness(1.1);
+    cursor: pointer;
+}

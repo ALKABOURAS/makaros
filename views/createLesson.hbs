@@ -1,0 +1,31 @@
+<div class="lesson-create-container">
+    <div class="page-header">
+        <h2>Δημιουργία Νέου Μαθήματος</h2>
+        <p>Ορίστε τα βασικά στοιχεία. Θα μπορέσετε να προσθέσετε κεφάλαια στη συνέχεια.</p>
+    </div>
+
+    <form action="/lessons/create" method="POST" enctype="multipart/form-data" class="modern-form">
+        <div class="form-section">
+            <label>Τίτλος Μαθήματος</label>
+            <input type="text" name="title" placeholder="π.χ. Τεχνητή Νοημοσύνη" required>
+        </div>
+
+        <div class="form-section">
+            <label>Περιγραφή</label>
+            <textarea name="description" rows="5" placeholder="Περιγράψτε συνοπτικά το μάθημα..."></textarea>
+        </div>
+
+        <div class="form-section">
+            <label>Banner Μαθήματος (Προαιρετικό)</label>
+            <div class="file-drop-area">
+                <input type="file" name="banner" id="bannerInput" accept="image/*">
+                <p>Σύρετε την εικόνα ή κάντε κλικ για επιλογή</p>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-create">Δημιουργία & Συνέχεια</button>
+            <a href="/" class="btn-cancel">Ακύρωση</a>
+        </div>
+    </form>
+</div>

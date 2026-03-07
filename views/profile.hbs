@@ -1,0 +1,35 @@
+<div class="profile-container">
+    <div class="profile-header">
+        <a href="/" class="back-btn">← Πίσω στην Αρχική</a>
+        <h2>Ρυθμίσεις Προφίλ</h2>
+    </div>
+
+    <form action="/profile/update" method="POST" enctype="multipart/form-data" class="profile-form">
+        <div class="avatar-edit-section">
+            <img src="{{user.avatar_path}}" alt="Avatar" class="large-avatar">
+            <input type="file" name="avatar" id="avatarInput" hidden>
+            <button type="button" class="btn-secondary" onclick="document.getElementById('avatarInput').click()">Αλλαγή Φωτογραφίας</button>
+        </div>
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Ονοματεπώνυμο</label>
+                <input type="text" name="fullName" value="{{user.fullName}}" required>
+            </div>
+            <div class="form-group">
+                <label>Αριθμός Μητρώου (ΑΜ)</label>
+                <input type="text" name="am" value="{{user.am}}">
+            </div>
+            <div class="form-group">
+                <label>Τηλέφωνο</label>
+                <input type="text" name="phone" value="{{user.phone}}">
+            </div>
+            <div class="form-group">
+                <label>Email (Μη επεξεργάσιμο)</label>
+                <input type="text" value="{{user.email}}" disabled class="disabled-input">
+            </div>
+        </div>
+
+        <button type="submit" class="btn-save">Αποθήκευση Αλλαγών</button>
+    </form>
+</div>
