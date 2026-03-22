@@ -1,0 +1,61 @@
+<div class="page-body">
+    <div class="lesson-header-card" style="border-left: 5px solid #a8b1ff;">
+        <div class="lesson-info">
+            <a href="/lessons/manage/{{lesson.id}}" class="back-link" style="color:#a8b1ff;">&larr; Πίσω στη Διαχείριση</a>
+            <h2 style="margin-top:10px;">Στατιστικά: <span style="color: #a8b1ff;">{{lesson.title}}</span></h2>
+            <p class="lesson-desc">Παρακολουθήστε την πρόοδο των εγγεγραμμένων φοιτητών σας.</p>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <h3>Εγγεγραμμένοι Φοιτητές ({{students.length}})</h3>
+
+        {{#if students.length}}
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; margin-top: 15px; text-align: left; color: #efefef;">
+                    <thead>
+                    <tr style="border-bottom: 2px solid #333; color: #aaa;">
+                        <th style="padding: 12px;">Ονοματεπώνυμο</th>
+                        <th style="padding: 12px;">Α.Μ.</th>
+                        <th style="padding: 12px;">Ημ/νία Εγγραφής</th>
+                        <th style="padding: 12px;">Πρόοδος ανά Κεφάλαιο</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {{#each students}}
+                        <tr style="border-bottom: 1px solid #222;">
+                            <td style="padding: 15px 12px; font-weight: bold;">{{this.fullName}}</td>
+                            <td style="padding: 15px 12px; color: #888;">{{this.am}}</td>
+                            <td style="padding: 15px 12px; font-size: 0.85rem; color: #888;">{{this.enrolled_at}}</td>
+                            <td style="padding: 15px 12px;">
+
+                                <!-- Εμφάνιση Badges για κάθε κεφάλαιο -->
+                                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                    {{#each this.chapterResults}}
+                                        <div title="{{this.chapterTitle}}" style="padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; border: 1px solid #444;
+                                            {{#if this.hasAttempted}}
+                                                {{#if this.passed}}background-color: rgba(76, 175, 80, 0.2); color: #4caf50; border-color: #4caf50;
+                                                {{else}}background-color: rgba(244, 67, 54, 0.2); color: #f44336; border-color: #f44336;{{/if}}
+                                            {{else}}background-color: #222; color: #666;{{/if}}">
+
+                                            Κεφ. {{this.order_num}}:
+                                            {{#if this.hasAttempted}}
+                                                {{this.score}}/{{this.total}}
+                                            {{else}}
+                                                -
+                                            {{/if}}
+                                        </div>
+                                    {{/each}}
+                                </div>
+
+                            </td>
+                        </tr>
+                    {{/each}}
+                    </tbody>
+                </table>
+            </div>
+        {{else}}
+            <p style="color: #888; text-align: center; padding: 20px;">Δεν υπάρχουν εγγεγραμμένοι φοιτητές ακόμα στο μάθημά σας.</p>
+        {{/if}}
+    </div>
+</div>

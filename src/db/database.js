@@ -66,6 +66,34 @@ async function database() {
         )
     `);
 
+    // Πίνακας Εγγραφών (Ποιος μαθητής γράφτηκε σε ποιο μάθημα)
+    await db.exec(`
+    CREATE TABLE IF NOT EXISTS enrollments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        student_id INTEGER,
+        lesson_id INTEGER,
+        enrolled_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(student_id, lesson_id), -- Αποτρέπει τη διπλή εγγραφή στο ίδιο μάθημα
+        FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (lesson_id) REFERENCES lessons(id) ON DELETE CASCADE
+    )
+`);
+
+// Πίνακας Αποτελεσμάτων Τεστ (Απαραίτητο για τη μελλοντική "αλυσίδα")
+    await db.exec(`
+        CREATE TABLE IF NOT EXISTS test_results (
+                                                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                                    student_id INTEGER,
+                                                    chapter_id INTEGER,
+                                                    score INTEGER NOT NULL,
+                                                    total_questions INTEGER NOT NULL,
+                                                    passed BOOLEAN DEFAULT 0,
+                                                    completed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                                                    FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
+                                                    FOREIGN KEY (chapter_id) REFERENCES chapters(id) ON DELETE CASCADE
+        )
+    `);
+
     return db;
 }
 

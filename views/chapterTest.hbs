@@ -1,0 +1,47 @@
+<div class="page-body">
+    <div class="lesson-header-card" style="justify-content: center; text-align: center; background-color: #1a1a1a;">
+        <h2>Τεστ: <span style="color: #64ffda;">{{chapter.title}}</span></h2>
+        <p style="color: #888;">Απαντήστε στις παρακάτω ερωτήσεις. Το σκορ σας θα υπολογιστεί αυτόματα.</p>
+    </div>
+
+    <div class="chart-container" style="max-width: 700px; margin: 0 auto;">
+        {{#if questions.length}}
+            <form action="/lessons/{{lessonId}}/chapters/{{chapter.id}}/test" method="POST">
+
+                {{#each questions}}
+                    <div class="question-block" style="background-color: #222; padding: 20px; border-radius: 12px; margin-bottom: 25px; border-left: 4px solid #64ffda;">
+                        <h4 style="margin-top: 0; color: #efefef; font-size: 1.1rem; line-height: 1.4;">
+                            {{this.question_text}}
+                        </h4>
+
+                        <div class="options-list" style="display: flex; flex-direction: column; gap: 12px; margin-top: 15px;">
+                            {{#each this.parsedOptions}}
+                                <label style="display: flex; align-items: center; gap: 10px; background-color: #1a1a1a; padding: 12px; border-radius: 8px; cursor: pointer; border: 1px solid #333; transition: border-color 0.2s;">
+                                    <!-- Το name της ερώτησης είναι q_ID (πχ q_5) για να το διαβάσουμε στον Controller -->
+                                    <input type="radio" name="q_{{../this.id}}" value="{{this}}" required style="accent-color: #64ffda; transform: scale(1.2);">
+                                    <span style="color: #ccc;">{{this}}</span>
+                                </label>
+                            {{/each}}
+                        </div>
+                    </div>
+                {{/each}}
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <button type="submit" class="submit-btn" style="background-color: #64ffda; color: #121212; padding: 15px 30px; font-size: 1.1rem; border-radius: 30px;">
+                        📤 Υποβολή Απαντήσεων
+                    </button>
+                </div>
+            </form>
+        {{else}}
+            <div style="text-align: center; padding: 30px;">
+                <p style="color: #aaa;">Ο καθηγητής δεν έχει προσθέσει ερωτήσεις ακόμα για αυτό το κεφάλαιο.</p>
+                <a href="/lessons/{{lessonId}}/view" class="back-link" style="color: #64ffda; display: inline-block; margin-top: 15px;">&larr; Επιστροφή</a>
+            </div>
+        {{/if}}
+    </div>
+</div>
+
+<!-- Ένα μικρό CSS hover για τα radio buttons -->
+<style>
+    label:hover { border-color: #64ffda !important; }
+</style>

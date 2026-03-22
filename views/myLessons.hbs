@@ -1,0 +1,28 @@
+<div class="page-body">
+    <h2 style="color: #efefef; margin-bottom: 25px;">Τα Μαθήματά μου</h2>
+
+    {{#if lessons.length}}
+        <div class="lessons-grid">
+            {{#each lessons}}
+                <!-- Επαναχρησιμοποιούμε την κλάση chart-container για το dark UI look -->
+                <div class="lesson-card chart-container">
+                    <img src="{{this.banner_path}}" alt="Banner Μαθήματος" class="lesson-banner">
+
+                    <div class="lesson-card-content">
+                        <h3>{{this.title}}</h3>
+                        <p class="lesson-preview-desc">{{this.description}}</p>
+
+                        <!-- Το μαγικό κουμπί που ενώνει το flow! -->
+                        <a href="/lessons/manage/{{this.id}}" class="btn-manage">⚙️ Διαχείριση Μαθήματος</a>
+                    </div>
+                </div>
+            {{/each}}
+        </div>
+    {{else}}
+        <div class="empty-state chart-container">
+            <p style="color: #888;">Δεν έχετε δημιουργήσει κάποιο μάθημα ακόμα.</p>
+            <br>
+            <a href="/lessons/create" class="submit-btn" style="text-decoration: none; padding: 12px 20px; display: inline-block; width: auto;">➕ Νέο Μάθημα</a>
+        </div>
+    {{/if}}
+</div>

@@ -1,0 +1,45 @@
+<div class="page-body">
+    <div class="lesson-header-card" style="border-left: 5px solid #a8b1ff;">
+        <div class="lesson-info">
+            <a href="/lessons/my-courses" class="back-link" style="color:#a8b1ff;">&larr; Πίσω στη Βιβλιοθήκη</a>
+            <h2 style="margin-top:10px;">{{lesson.title}}</h2>
+            <p class="lesson-desc">{{lesson.description}}</p>
+        </div>
+    </div>
+
+    <div class="chart-container" style="max-width: 800px; margin: 0 auto;">
+        <h3 style="border-bottom: 1px solid #333; padding-bottom: 15px;">Κεφάλαια Μαθήματος</h3>
+
+        <div class="chapters-list">
+            {{#each chapters}}
+                <div class="chapter-item" style="display: flex; justify-content: space-between; align-items: center; padding: 20px;">
+
+                    <div class="chapter-info" style="flex: 1;">
+                        <h4 style="margin: 0 0 10px 0; color: #efefef;">
+                            <span class="chapter-order" style="margin-right: 10px;">#{{this.order_num}}</span>
+                            {{this.title}}
+                        </h4>
+                        <p style="color: #aaa; font-size: 0.9rem; margin-bottom: 15px; line-height: 1.5;">{{this.content}}</p>
+
+                        <!-- Προβολή Σκορ (αν το έχει κάνει) -->
+                        {{#if this.hasAttempted}}
+                            <div style="font-size: 0.85rem; padding: 8px 12px; border-radius: 6px; display: inline-block;
+                                {{#if this.passed}}background-color: rgba(76, 175, 80, 0.1); border: 1px solid #4caf50; color: #4caf50;
+                                {{else}}background-color: rgba(244, 67, 54, 0.1); border: 1px solid #f44336; color: #f44336;{{/if}}">
+                                Σκορ: <strong>{{this.score}} / {{this.total_questions}}</strong> ({{this.percentage}}%)
+                                - {{#if this.passed}}Επιτυχία ✅{{else}}Αποτυχία ❌{{/if}}
+                            </div>
+                        {{/if}}
+                    </div>
+
+                    <div class="chapter-action" style="margin-left: 20px;">
+                        <a href="/lessons/{{../lesson.id}}/chapters/{{this.id}}/test" class="submit-btn" style="text-decoration: none; padding: 10px 20px; background-color: #64ffda; color: #121212;">
+                            {{#if this.hasAttempted}}🔁 Επανάληψη Τεστ{{else}}📝 Έναρξη Τεστ{{/if}}
+                        </a>
+                    </div>
+
+                </div>
+            {{/each}}
+        </div>
+    </div>
+</div>

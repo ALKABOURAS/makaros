@@ -14,13 +14,14 @@
     <a href="/" class="nav-item">Αρχική</a>
     <a href="/profile" class="nav-item">Προφίλ</a> <!-- Εδώ! -->
 {{#if (eq user.role "student")}}
-    <a href="/lessons" class="nav-item">Μαθήματα</a>
+    <a href="/lessons/my-courses" class="nav-item">Τα Μαθήματα μου</a>
+    <a href="/lessons/catalog" class="nav-item">Κατάλογος Μαθημάτων</a>
 {{/if}}
     {{#if (eq user.role "professor")}}
         <hr class="nav-divider">
         <p class="nav-label">Διαχείριση</p>
-        <a href="/lessons/create" class="nav-item">➕ Νέο Μάθημα</a>
-        <a href="/lessons/my-lessons" class="nav-item">📝 Τα Μαθήματά μου</a>
+        <a href="/lessons/create" class="nav-item">Νέο Μάθημα</a>
+        <a href="/lessons/my-lessons" class="nav-item">Τα Μαθήματά μου</a>
     {{/if}}
 </nav>
 

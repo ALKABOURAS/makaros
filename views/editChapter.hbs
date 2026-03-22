@@ -1,0 +1,31 @@
+<div class="page-body">
+    <div class="lesson-header-card" style="justify-content: flex-start; gap: 20px;">
+        <a href="/lessons/manage/{{lessonId}}" class="submit-btn" style="width: auto; padding: 10px 15px; text-decoration: none; background-color: #333; color: #efefef;">&larr; Πίσω</a>
+        <div class="lesson-info">
+            <h2>Επεξεργασία Κεφαλαίου</h2>
+        </div>
+    </div>
+
+    <div class="chart-container" style="max-width: 600px; margin: 0 auto;">
+        <form action="/lessons/manage/{{lessonId}}/chapters/{{chapter.id}}/edit" method="POST" class="custom-form">
+
+            <div class="form-group">
+                <label for="title">Τίτλος Κεφαλαίου</label>
+                <!-- Το value="{{chapter.title}}" προσυμπληρώνει το πεδίο -->
+                <input type="text" id="title" name="title" required value="{{chapter.title}}">
+            </div>
+
+            <div class="form-group">
+                <label for="order_num">Σειρά Εμφάνισης</label>
+                <input type="number" id="order_num" name="order_num" required value="{{chapter.order_num}}" min="1">
+            </div>
+
+            <div class="form-group">
+                <label for="content">Σύντομη Περιγραφή / Περιεχόμενο</label>
+                <textarea id="content" name="content" rows="6">{{chapter.content}}</textarea>
+            </div>
+
+            <button type="submit" class="submit-btn" style="background-color: #a8b1ff;">Αποθήκευση Αλλαγών</button>
+        </form>
+    </div>
+</div>

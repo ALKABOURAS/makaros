@@ -1,0 +1,33 @@
+<div class="page-body">
+    <div class="lesson-header-card" style="background-color: #1a1a1a; border-left: 5px solid #64ffda;">
+        <div class="lesson-info">
+            <h2>Η Βιβλιοθήκη μου</h2>
+            <p class="lesson-desc">Τα μαθήματα που παρακολουθείτε. Συνεχίστε από εκεί που σταματήσατε!</p>
+        </div>
+    </div>
+
+    {{#if lessons.length}}
+        <div class="lessons-grid">
+            {{#each lessons}}
+                <div class="lesson-card chart-container">
+                    <img src="{{this.banner_path}}" alt="Banner Μαθήματος" class="lesson-banner">
+
+                    <div class="lesson-card-content">
+                        <h3>{{this.title}}</h3>
+                        <p class="lesson-preview-desc">{{this.description}}</p>
+
+                        <!-- Προχωράει μέσα στο μάθημα για να δει τα Κεφάλαια -->
+                        <a href="/lessons/{{this.id}}/view" class="btn-manage" style="background-color: #64ffda; color: #121212;">
+                            📖 Είσοδος
+                        </a>
+                    </div>
+                </div>
+            {{/each}}
+        </div>
+    {{else}}
+        <div class="empty-state chart-container" style="text-align: center;">
+            <p style="color: #888; margin-bottom: 20px;">Δεν παρακολουθείτε κάποιο μάθημα ακόμα.</p>
+            <a href="/lessons/catalog" class="submit-btn" style="text-decoration: none; padding: 10px 20px;">🔍 Αναζήτηση Μαθημάτων</a>
+        </div>
+    {{/if}}
+</div>

@@ -1,46 +1,50 @@
 <i data-lucide="home"></i>
 <div class="dashboard-overview">
-    <h2 class="section-title">Επισκόπηση</h2>
+    <h2 class="section-title">Επισκόπηση: {{user.fullName}}</h2>
 
-    <!-- 4 Στατιστικά Κουτάκια (Stats Grid) -->
+    <!-- 4 Στατιστικά Κουτάκια (Stats Grid) με δυναμικά δεδομένα! -->
     <div class="stats-grid">
         <div class="stat-card blue">
-            <span class="stat-label">Επιλεγμένα Μαθήματα</span>
+            <span class="stat-label">{{stats.card1.label}}</span>
             <div class="stat-main">
-                <span class="stat-value">14</span>
-                <span class="stat-percent">40%</span>
+                <span class="stat-value">{{stats.card1.value}}</span>
+                <span class="stat-percent">{{stats.card1.percent}}</span>
             </div>
         </div>
 
         <div class="stat-card pink">
-            <span class="stat-label">Ολοκληρωμένα</span>
+            <span class="stat-label">{{stats.card2.label}}</span>
             <div class="stat-main">
-                <span class="stat-value">12</span>
-                <span class="stat-percent">85.7%</span>
+                <span class="stat-value">{{stats.card2.value}}</span>
+                <span class="stat-percent">{{stats.card2.percent}}</span>
             </div>
         </div>
 
         <div class="stat-card purple">
-            <span class="stat-label">Ασκήσεις</span>
+            <span class="stat-label">{{stats.card3.label}}</span>
             <div class="stat-main">
-                <span class="stat-value">105</span>
-                <span class="stat-percent">30%</span>
+                <span class="stat-value">{{stats.card3.value}}</span>
+                <span class="stat-percent">{{stats.card3.percent}}</span>
             </div>
         </div>
 
         <div class="stat-card yellow">
-            <span class="stat-label">Βαθμός</span>
+            <span class="stat-label">{{stats.card4.label}}</span>
             <div class="stat-main">
-                <span class="stat-value">9.81</span>
-                <span class="stat-percent positive">+6.08% ↗</span>
+                <span class="stat-value">{{stats.card4.value}}</span>
+                <span class="stat-percent positive">{{stats.card4.percent}}</span>
             </div>
         </div>
     </div>
 
-    <!-- Filler Περιοχή για το Γράφημα (Εξέλιξη Μ.Ο.) -->
+    <!-- Filler Περιοχή για το Γράφημα (Εξέλιξη / Δραστηριότητα) -->
     <div class="chart-container main-chart">
         <div class="chart-header">
-            <h3>Εξέλιξη Μέσου Όρου</h3>
+            {{#if (eq user.role "professor")}}
+                <h3>Δραστηριότητα Φοιτητών στα Μαθήματά σας</h3>
+            {{else}}
+                <h3>Εξέλιξη Μέσου Όρου</h3>
+            {{/if}}
         </div>
         <div class="chart-placeholder">
             <!-- Εδώ θα μπει το Chart.js αργότερα -->
@@ -48,11 +52,16 @@
         </div>
     </div>
 
-    <!-- Κάτω Μέρος: Κορυφαία Μαθήματα -->
+    <!-- Κάτω Μέρος: Top Λίστα -->
     <div class="chart-container bottom-chart">
-        <h3>Κορυφαία Μαθήματα / Ασκήσεις</h3>
+        {{#if (eq user.role "professor")}}
+            <h3>Τα πιο δημοφιλή σας Μαθήματα</h3>
+        {{else}}
+            <h3>Κορυφαία Μαθήματα / Ασκήσεις</h3>
+        {{/if}}
+
         <div class="bar-chart-mockup">
-            <!-- Απλό CSS bar mockup για τώρα -->
+            <!-- Απλό CSS bar mockup για τώρα (Διατηρείται ως είχε) -->
             <div class="bar-item"><div class="bar" style="height: 80%; background: #c2c2f0;"></div><span>Σύγχρονα Οικ.</span></div>
             <div class="bar-item"><div class="bar" style="height: 60%; background: #b2f2bb;"></div><span>Οικ. Θεωρία</span></div>
             <div class="bar-item"><div class="bar" style="height: 90%; background: #d0bfff;"></div><span>Μακροοικονομικά</span></div>

@@ -1,0 +1,193 @@
+<div class="page-body">
+    <!-- Header Μαθήματος -->
+    <div class="lesson-header-card" style="display: flex; justify-content: space-between; align-items: center;">
+        <div class="lesson-info">
+            <h2>Διαχείριση: <span class="highlight">{{lesson.title}}</span></h2>
+            <p class="lesson-desc">{{lesson.description}}</p>
+        </div>
+
+        <div>
+            <a href="/lessons/manage/{{lesson.id}}/students" class="submit-btn" style="background-color: #a8b1ff; color: #121212; text-decoration: none; padding: 12px 20px; font-weight: bold;">
+                Στατιστικά / Φοιτητές
+            </a>
+        </div>
+    </div>
+
+    <div class="manage-grid">
+        <!-- Αριστερή Στήλη: Λίστα Κεφαλαίων -->
+        <div class="chapters-section chart-container">
+            <h3>Ύλη Μαθήματος (Κεφάλαια)</h3>
+
+            {{#if chapters.length}}
+                <div class="chapters-list">
+                    {{#each chapters}}
+                        <div class="chapter-item">
+                            <div class="chapter-header" style="display: flex; justify-content: space-between; align-items: center;">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <span class="chapter-order">#{{this.order_num}}</span>
+                                    <h4>{{this.title}}</h4>
+                                </div>
+
+                                <!-- Κουμπιά Ενεργειών (Edit / Delete) -->
+                                <div class="chapter-actions">
+                                    <!-- Κουμπί Επεξεργασίας -->
+                                    <a href="/lessons/manage/{{../lesson.id}}/chapters/{{this.id}}/edit" class="action-btn edit-btn" title="Επεξεργασία">✏️</a>
+
+                                    <!-- Φόρμα Διαγραφής (με επιβεβαίωση JavaScript) -->
+                                    <form action="/lessons/manage/{{../lesson.id}}/chapters/{{this.id}}/delete" method="POST" style="display:inline;" onsubmit="return confirm('Είστε σίγουροι ότι θέλετε να διαγράψετε το κεφάλαιο; Όλες οι ερωτήσεις του θα χαθούν!');">
+                                        <button type="submit" class="action-btn delete-btn" title="Διαγραφή">🗑️</button>
+                                    </form>
+                                </div>
+                            </div>
+                            <p class="chapter-content-preview">{{this.content}}</p>
+                            <hr class="chapter-divider">
+
+                            <details class="questions-accordion">
+                                <summary>Ερωτήσεις ({{this.questions.length}})</summary>
+
+                                <!-- Λίστα Υπαρχουσών Ερωτήσεων -->
+                                <div class="questions-list">
+                                    {{#if this.questions.length}}
+                                        {{#each this.questions}}
+                                            <div class="question-item">
+                                                <div class="q-header">
+                                                    <strong>Ερώτηση:</strong> {{this.question_text}}
+                                                    <span class="diff-badge diff-{{this.difficulty}}">Δυσκολία: {{this.difficulty}}/5</span>
+                                                </div>
+
+                                                <div class="q-options">
+                                                    {{#each this.parsedOptions}}
+                                                        <span class="q-opt {{#if (eq this ../this.correct_answer)}}correct{{/if}}">
+                                                            {{this}}
+                                                        </span>
+                                                    {{/each}}
+                                                </div>
+                                            </div>
+                                        {{/each}}
+                                    {{else}}
+                                        <p class="empty-state" style="font-size: 0.85rem;">Δεν υπάρχουν ερωτήσεις σε αυτό το κεφάλαιο.</p>
+                                    {{/if}}
+                                </div>
+
+                                <!-- Φόρμα Νέας Ερώτησης -->
+                                <div class="add-question-box">
+                                    <h5>➕ Νέα Ερώτηση</h5>
+                                    <form action="/lessons/manage/{{../lesson.id}}/chapters/{{this.id}}/questions" method="POST" class="custom-form">
+
+                                        <div class="form-group">
+                                            <label>Εκφώνηση Ερώτησης</label>
+                                            <textarea name="question_text" rows="2" required></textarea>
+                                        </div>
+
+                                        <div class="form-row" style="display: flex; gap: 15px;">
+                                            <div class="form-group" style="flex: 1;">
+                                                <label>Τύπος</label>
+                                                <select name="type" required onchange="toggleQuestionFields(this, '{{this.id}}')">
+                                                    <option value="multiple_choice">Πολλαπλής Επιλογής</option>
+                                                    <option value="true_false">Σωστό / Λάθος</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group" style="flex: 1;">
+                                                <label>Δυσκολία (1-5)</label>
+                                                <select name="difficulty" required>
+                                                    <option value="1">1 - Πολύ Εύκολη</option>
+                                                    <option value="2">2 - Εύκολη</option>
+                                                    <option value="3">3 - Μέτρια</option>
+                                                    <option value="4">4 - Δύσκολη</option>
+                                                    <option value="5">5 - Απαιτητική</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <!-- Πεδία για Multiple Choice -->
+                                        <div id="mc-fields-{{this.id}}">
+                                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                                <input type="text" name="opt1" placeholder="Επιλογή 1">
+                                                <input type="text" name="opt2" placeholder="Επιλογή 2">
+                                                <input type="text" name="opt3" placeholder="Επιλογή 3">
+                                                <input type="text" name="opt4" placeholder="Επιλογή 4">
+                                            </div>
+                                            <div class="form-group" style="margin-top: 10px;">
+                                                <label>Σωστή Επιλογή</label>
+                                                <select name="correct_option_index">
+                                                    <option value="1">Επιλογή 1</option>
+                                                    <option value="2">Επιλογή 2</option>
+                                                    <option value="3">Επιλογή 3</option>
+                                                    <option value="4">Επιλογή 4</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <!-- Πεδία για True/False (Κρυμμένα αρχικά) -->
+                                        <div id="tf-fields-{{this.id}}" style="display: none;">
+                                            <div class="form-group" style="margin-top: 10px;">
+                                                <label>Ποια είναι η Σωστή Απάντηση;</label>
+                                                <select name="tf_correct_answer">
+                                                    <option value="Σωστό">Σωστό</option>
+                                                    <option value="Λάθος">Λάθος</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <button type="submit" class="submit-btn" style="background-color: #4caf50; margin-top: 15px;">Αποθήκευση Ερώτησης</button>
+                                    </form>
+                                </div>
+                            </details>
+                        </div>
+                    {{/each}}
+                </div>
+            {{else}}
+                <p class="empty-state">Δεν έχουν προστεθεί κεφάλαια ακόμα. Ξεκινήστε προσθέτοντας το πρώτο!</p>
+            {{/if}}
+        </div>
+
+        <!-- Δεξιά Στήλη: Φόρμα Νέου Κεφαλαίου -->
+        <div class="add-chapter-section chart-container">
+            <h3>Προσθήκη Νέου Κεφαλαίου</h3>
+            <form action="/lessons/manage/{{lesson.id}}/chapters" method="POST" class="custom-form">
+
+                <div class="form-group">
+                    <label for="title">Τίτλος Κεφαλαίου</label>
+                    <input type="text" id="title" name="title" required placeholder="π.χ. Εισαγωγή στους Αλγορίθμους">
+                </div>
+
+                <div class="form-group">
+                    <label for="order_num">Σειρά Εμφάνισης</label>
+                    <input type="number" id="order_num" name="order_num" required placeholder="π.χ. 1" min="1">
+                </div>
+
+                <div class="form-group">
+                    <label for="content">Σύντομη Περιγραφή / Περιεχόμενο</label>
+                    <textarea id="content" name="content" rows="4" placeholder="Τι θα μάθουν οι φοιτητές σε αυτό το κεφάλαιο;"></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn">Προσθήκη Κεφαλαίου</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleQuestionFields(selectElement, chapterId) {
+        const mcFields = document.getElementById('mc-fields-' + chapterId);
+        const tfFields = document.getElementById('tf-fields-' + chapterId);
+
+        if (selectElement.value === 'multiple_choice') {
+            mcFields.style.display = 'block';
+            tfFields.style.display = 'none';
+            // Προσθήκη required
+            mcFields.querySelectorAll('input').forEach(i => i.setAttribute('required', 'true'));
+        } else {
+            mcFields.style.display = 'none';
+            tfFields.style.display = 'block';
+            // Αφαίρεση required
+            mcFields.querySelectorAll('input').forEach(i => i.removeAttribute('required'));
+        }
+    }
+    // Αρχικοποίηση κατά το φόρτωμα (να είναι required τα inputs του multiple choice)
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('select[name="type"]').forEach(select => {
+            toggleQuestionFields(select, select.id.replace('type-', '')); // trigger logic
+        });
+    });
+</script>

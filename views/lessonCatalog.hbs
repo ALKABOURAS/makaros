@@ -1,0 +1,40 @@
+<div class="page-body">
+    <div class="lesson-header-card">
+        <div class="lesson-info">
+            <h2>Διαθέσιμα Μαθήματα</h2>
+            <p class="lesson-desc">Εξερευνήστε και εγγραφείτε στα μαθήματα που σας ενδιαφέρουν.</p>
+        </div>
+    </div>
+
+    {{#if lessons.length}}
+        <div class="lessons-grid">
+            {{#each lessons}}
+                <div class="lesson-card chart-container">
+                    <img src="{{this.banner_path}}" alt="Banner Μαθήματος" class="lesson-banner">
+
+                    <div class="lesson-card-content">
+                        <h3>{{this.title}}</h3>
+                        <p class="lesson-preview-desc">{{this.description}}</p>
+
+                        <!-- Η Λογική της Εγγραφής -->
+                        {{#if this.isEnrolled}}
+                            <div class="enrolled-badge" style="background-color: rgba(76, 175, 80, 0.1); color: #4caf50; padding: 10px; text-align: center; border-radius: 8px; border: 1px solid #4caf50;">
+                                ✅ Είστε εγγεγραμμένος
+                                <!-- Εδώ αργότερα θα βάλουμε το link "Είσοδος στο Μάθημα/Τεστ" -->
+                            </div>
+                        {{else}}
+                            <form action="/lessons/enroll/{{this.id}}" method="POST">
+                                <button type="submit" class="btn-manage" style="width: 100%; border: none; cursor: pointer;">➕ Εγγραφή στο Μάθημα</button>
+                            </form>
+                        {{/if}}
+
+                    </div>
+                </div>
+            {{/each}}
+        </div>
+    {{else}}
+        <div class="empty-state chart-container">
+            <p style="color: #888;">Δεν υπάρχουν διαθέσιμα μαθήματα αυτή τη στιγμή.</p>
+        </div>
+    {{/if}}
+</div>

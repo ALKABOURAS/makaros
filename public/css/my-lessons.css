@@ -1,0 +1,69 @@
+/* my-lessons.css */
+
+.lessons-grid {
+    display: grid;
+    /* Responsive grid: Κάρτες τουλάχιστον 300px, γεμίζουν τον χώρο */
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+}
+
+.lesson-card {
+    padding: 0; /* Μηδενίζουμε το padding για να πάει η εικόνα από άκρη σε άκρη */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.lesson-card:hover {
+    transform: translateY(-5px);
+    border-color: #555;
+}
+
+.lesson-banner {
+    width: 100%;
+    height: 150px;
+    object-fit: cover; /* Κόβει την εικόνα σωστά χωρίς να την παραμορφώνει */
+    border-bottom: 1px solid #2a2a2a;
+}
+
+.lesson-card-content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Αναγκάζει το περιεχόμενο να πιάσει όλο το ύψος */
+}
+
+.lesson-card-content h3 {
+    margin: 0 0 10px 0;
+    color: #efefef;
+    font-size: 1.2rem;
+}
+
+.lesson-preview-desc {
+    color: #888;
+    font-size: 0.9rem;
+    margin: 0 0 20px 0;
+    flex-grow: 1; /* Σπρώχνει το κουμπί στο τέλος της κάρτας */
+
+    /* Περιορισμός κειμένου σε 3 γραμμές με "..." στο τέλος */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.btn-manage {
+    background-color: #a8b1ff; /* Accent χρώμα */
+    color: #121212;
+    text-align: center;
+    padding: 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.btn-manage:hover {
+    background-color: #8e99f7;
+}
