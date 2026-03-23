@@ -142,7 +142,7 @@ exports.getMyLessons = async (req, res) => {
     }
 };
 
-// --- GET: Εμφάνιση Σελίδας Επεξεργασίας Κεφαλαίου ---
+
 exports.getEditChapter = async (req, res) => {
     const { lessonId, chapterId } = req.params;
     const db = await initDb();
@@ -171,7 +171,7 @@ exports.getEditChapter = async (req, res) => {
     }
 };
 
-// --- POST: Αποθήκευση Επεξεργασίας Κεφαλαίου ---
+
 exports.postEditChapter = async (req, res) => {
     const { lessonId, chapterId } = req.params;
     const { title, content, order_num } = req.body;
@@ -190,7 +190,7 @@ exports.postEditChapter = async (req, res) => {
     }
 };
 
-// --- POST: Διαγραφή Κεφαλαίου ---
+
 exports.postDeleteChapter = async (req, res) => {
     const { lessonId, chapterId } = req.params;
     const db = await initDb();
@@ -209,7 +209,7 @@ exports.postDeleteChapter = async (req, res) => {
     }
 };
 
-// --- POST: Προσθήκη Ερώτησης ---
+
 exports.postAddQuestion = async (req, res) => {
     const { lessonId, chapterId } = req.params;
     const { question_text, type, difficulty, correct_option_index } = req.body;
@@ -335,7 +335,7 @@ exports.getMyEnrolledLessons = async (req, res) => {
     }
 };
 
-// --- GET: Προβολή Μαθήματος & Κεφαλαίων (Για Μαθητή) ---
+
 exports.getLessonView = async (req, res) => {
     const lessonId = req.params.id;
     const studentId = req.session.user.id;
@@ -386,7 +386,7 @@ exports.getLessonView = async (req, res) => {
     }
 };
 
-// --- GET: Σελίδα Εξέτασης Κεφαλαίου ---
+
 exports.getChapterTest = async (req, res) => {
     const { lessonId, chapterId } = req.params;
     const db = await initDb();
@@ -416,7 +416,7 @@ exports.getChapterTest = async (req, res) => {
     }
 };
 
-// --- POST: Βαθμολόγηση του Τεστ ---
+
 exports.postChapterTest = async (req, res) => {
     const { lessonId, chapterId } = req.params;
     const studentId = req.session.user.id;
@@ -454,7 +454,7 @@ exports.postChapterTest = async (req, res) => {
     }
 };
 
-// --- GET: Στατιστικά και Εγγεγραμμένοι Φοιτητές (Καθηγητής) ---
+
 exports.getLessonStudents = async (req, res) => {
     const lessonId = req.params.id;
     const db = await initDb();

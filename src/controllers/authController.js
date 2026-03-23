@@ -29,7 +29,7 @@ exports.postLogin = async (req, res) => {
         if (match) {
             req.session.user = {
                 id: user.id,
-                email: user.email, // Αλλαγή εδώ
+                email: user.email,
                 role: user.role,
                 fullName: user.fullName,
                 am: user.am,
@@ -59,9 +59,9 @@ exports.postSignup = async (req, res) => {
         );
 
         console.log("✅ Χρήστης δημιουργήθηκε, ανακατεύθυνση...");
-        res.redirect('/auth/login'); // Εδώ ΠΡΕΠΕΙ να σε στείλει στο login
+        res.redirect('/auth/login'); // Εδώ ανακατευθύνουμε στο login μετά την επιτυχή εγγραφή
     } catch (err) {
-        console.error("❌ Σφάλμα εγγραφής:", err.message);
+        console.error("Σφάλμα εγγραφής:", err.message);
         // Αν αποτύχει, ξαναδείχνει τη σελίδα εγγραφής με το μήνυμα λάθους
         res.render('signup', {
             style: 'signup.css',

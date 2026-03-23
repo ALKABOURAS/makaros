@@ -1,4 +1,4 @@
-const initDb = require('../db/database'); // Προσοχή: Βάλε το σωστό path για το database.js σου
+const initDb = require('../db/database');
 
 exports.getHome = async (req, res) => {
     const user = req.session.user;
@@ -69,7 +69,7 @@ exports.getHome = async (req, res) => {
             title: 'Αρχική - Dashboard',
             user: user,
             avatar: displayAvatar,
-            stats: stats // Περνάμε το αντικείμενο stats στο View
+            stats: stats // Περνάμε το αντικείμενο με τα στατιστικά για να γεμίσει τα cards στο UI
         });
 
     } catch (err) {

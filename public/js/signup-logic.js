@@ -3,7 +3,7 @@ const confirmInput = document.querySelector('input[name="confirmPassword"]');
 const signupForm = document.querySelector('.auth-form');
 const bars = document.querySelectorAll('.bar');
 
-// 1. Λογική για το Χρωματισμό των Bars (Strength Meter)
+// 1. Λογική για το Χρωματισμό των Bars ανάλογα με τη δύναμη του κωδικού
 passwordInput.addEventListener('input', () => {
     const val = passwordInput.value;
     let strength = 0;

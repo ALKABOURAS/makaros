@@ -3,7 +3,7 @@ const path = require('path');
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'public/uploads/avatars/'); // Ο φάκελος που φτιάξαμε
+        cb(null, 'public/uploads/avatars/');
     },
     filename: (req, file, cb) => {
         // Όνομα αρχείου: userid-timestamp.jpg

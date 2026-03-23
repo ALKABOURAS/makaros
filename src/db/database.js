@@ -79,7 +79,7 @@ async function database() {
     )
 `);
 
-// Πίνακας Αποτελεσμάτων Τεστ (Απαραίτητο για τη μελλοντική "αλυσίδα")
+
     await db.exec(`
         CREATE TABLE IF NOT EXISTS test_results (
                                                     id INTEGER PRIMARY KEY AUTOINCREMENT,

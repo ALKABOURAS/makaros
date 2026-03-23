@@ -69,7 +69,7 @@ initDb().then(() => {
         console.error('SERVER ERROR:', err);
     });
 }).catch(err => {
-    console.error('❌ Σφάλμα:', err);
+    console.error('Σφάλμα:', err);
 });
 
 // Δες αν η Node κλείνει για "μυστήριο" λόγο

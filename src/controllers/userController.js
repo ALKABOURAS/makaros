@@ -18,13 +18,9 @@ exports.updateProfile = async (req, res) => {
     const userId = req.session.user.id;
     const db = await initDb();
 
-    // DEBUG: Δες στο τερματικό αν έρχονται οι τιμές
-    console.log("Λήψη δεδομένων:", { fullName, phone, am });
-
     let newAvatarPath = req.session.user.avatar_path;
 
     if (req.file) {
-        // Σημαντικό: χρησιμοποιούμε το filename που έδωσε ο multer
         newAvatarPath = '/uploads/avatars/' + req.file.filename;
         console.log("Νέο Avatar αρχείο:", req.file.filename);
     }
@@ -41,7 +37,7 @@ exports.updateProfile = async (req, res) => {
         req.session.user.am = am;
         req.session.user.avatar_path = newAvatarPath;
 
-        // ΚΡΙΣΙΜΟ: Χειροκίνητη αποθήκευση του session πριν το redirect
+
         req.session.save((err) => {
             if (err) console.error("Session Save Error:", err);
             res.redirect('/profile?success=1');
