@@ -212,7 +212,12 @@ exports.postDeleteChapter = async (req, res) => {
 
 exports.postAddQuestion = async (req, res) => {
     const { lessonId, chapterId } = req.params;
-    const { question_text, type, difficulty, correct_option_index } = req.body;
+    const {
+        question_text, type, difficulty,
+        correct_option_index, tf_correct_answer, opt1, opt2, opt3, opt4,
+        regex_answer, fb_options, fb_correct_1, fb_correct_2, fb_correct_3
+    } = req.body;
+
     const db = await initDb();
 
     try {
@@ -220,22 +225,34 @@ exports.postAddQuestion = async (req, res) => {
         let correctAnswerText = "";
 
         if (type === 'multiple_choice') {
-            // Παίρνουμε τις 4 επιλογές από τη φόρμα
-            optionsArray =[req.body.opt1, req.body.opt2, req.body.opt3, req.body.opt4];
-            // Βρίσκουμε ποιο κείμενο αντιστοιχεί στη σωστή επιλογή (1, 2, 3 ή 4)
+            optionsArray =[opt1, opt2, opt3, opt4];
             correctAnswerText = optionsArray[parseInt(correct_option_index) - 1];
         }
         else if (type === 'true_false') {
-            optionsArray = ['Σωστό', 'Λάθος'];
-            correctAnswerText = req.body.tf_correct_answer; // Θα έρθει 'Σωστό' ή 'Λάθος' από τη φόρμα
+            optionsArray = ['true', 'false'];
+            correctAnswerText = tf_correct_answer || 'true';
+        }
+        else if (type === 'open_ended') {
+            // Δεν υπάρχουν επιλογές, η απάντηση είναι το Regex pattern
+            optionsArray =[];
+            correctAnswerText = regex_answer.trim();
+        }
+        else if (type === 'fill_blanks') {
+            // Χωρίζουμε τις λέξεις με κόμμα και φτιάχνουμε array
+            optionsArray = fb_options.split(',').map(s => s.trim());
+            // Αποθηκεύουμε ως JSON ποιες λέξεις αντιστοιχούν σε ποια κενά [1], [2], [3]
+            const correctObj = {};
+            if(fb_correct_1) correctObj["1"] = fb_correct_1.trim();
+            if(fb_correct_2) correctObj["2"] = fb_correct_2.trim();
+            if(fb_correct_3) correctObj["3"] = fb_correct_3.trim();
+            correctAnswerText = JSON.stringify(correctObj);
         }
 
-        // Μετατρέπουμε το array σε String για να μπει στο TEXT πεδίο της βάσης
         const optionsStr = JSON.stringify(optionsArray);
 
         await db.run(
-            `INSERT INTO questions (chapter_id, question_text, type, difficulty, correct_answer, options) 
-             VALUES (?, ?, ?, ?, ?, ?)`,[chapterId, question_text, type, difficulty, correctAnswerText, optionsStr]
+            `INSERT INTO questions (chapter_id, question_text, type, difficulty, correct_answer, options)
+             VALUES (?, ?, ?, ?, ?, ?)`,[chapterId, question_text, type, difficulty || 3, correctAnswerText, optionsStr]
         );
 
         res.redirect(`/lessons/manage/${lessonId}`);
@@ -386,20 +403,83 @@ exports.getLessonView = async (req, res) => {
     }
 };
 
-
+// --- GET: Σελίδα Εξέτασης (Smart Algorithm - 1 Ερώτηση τη φορά) ---
 exports.getChapterTest = async (req, res) => {
     const { lessonId, chapterId } = req.params;
     const db = await initDb();
 
     try {
-        const chapter = await db.get(`SELECT * FROM chapters WHERE id = ?`,[chapterId]);
-        const questions = await db.all(`SELECT * FROM questions WHERE chapter_id = ?`,[chapterId]);
+        // 1. Έλεγχος / Αρχικοποίηση Session Τεστ
+        // Αν το URL έχει ?start=true, ή αν δεν υπάρχει ενεργό τεστ, ξεκινάμε νέο!
+        if (req.query.start === 'true' || !req.session.currentTest || req.session.currentTest.chapterId !== chapterId) {
+            req.session.currentTest = {
+                lessonId: lessonId,
+                chapterId: chapterId,
+                currentDifficulty: 3, // Ξεκινάμε πάντα με Μέτρια δυσκολία!
+                askedQuestionIds:[], // Ποιες ερωτήσεις του έπεσαν ήδη
+                correctAnswers: 0,
+                totalTarget: 5, // Το τεστ θα έχει μάξιμουμ 5 ερωτήσεις
+                currentQuestion: null // Η ερώτηση που βλέπει αυτή τη στιγμή
+            };
+        }
 
-        // Parse τα options για να εμφανίσουμε τα radio buttons
-        const parsedQuestions = questions.map(q => {
-            q.parsedOptions = JSON.parse(q.options);
-            return q;
-        });
+        const testState = req.session.currentTest;
+
+        // 2. Αν έπιασε τον στόχο των ερωτήσεων, τερματίζει!
+        if (testState.askedQuestionIds.length >= testState.totalTarget) {
+            return await finishTestAndSave(req, res, db, testState);
+        }
+
+        const chapter = await db.get(`SELECT * FROM chapters WHERE id = ?`, [chapterId]);
+
+        // 3. Επιλογή επόμενης ερώτησης (Αν δεν έχει ήδη φορτωθεί λόγω refresh)
+        if (!testState.currentQuestion) {
+            // Βρίσκουμε ερωτήσεις που ΔΕΝ έχουν ρωτηθεί ακόμα
+            const placeholders = testState.askedQuestionIds.map(() => '?').join(',');
+            const queryExtra = testState.askedQuestionIds.length > 0 ? `AND id NOT IN (${placeholders})` : '';
+
+            const availableQuestions = await db.all(
+                `SELECT * FROM questions WHERE chapter_id = ? ${queryExtra}`,
+                [chapterId, ...testState.askedQuestionIds]
+            );
+
+            if (availableQuestions.length === 0) {
+                // Αν δεν υπάρχουν άλλες ερωτήσεις (το κεφάλαιο είχε λιγότερες από 5), τερματίζουμε
+                if (testState.askedQuestionIds.length === 0) {
+                    return res.send("Ο καθηγητής δεν έχει προσθέσει ερωτήσεις σε αυτό το κεφάλαιο.");
+                }
+                return await finishTestAndSave(req, res, db, testState);
+            }
+
+            // --- SMART LOGIC SELECTION ---
+            // Ψάχνουμε ερώτηση με την *τρέχουσα* δυσκολία που θέλει ο αλγόριθμος
+            let nextQuestion = availableQuestions.find(q => q.difficulty === testState.currentDifficulty);
+
+            // Fallback: Αν δεν υπάρχει ερώτηση με αυτή ακριβώς τη δυσκολία, του δίνουμε την πιο κοντινή!
+            if (!nextQuestion) {
+                availableQuestions.sort((a, b) => Math.abs(a.difficulty - testState.currentDifficulty) - Math.abs(b.difficulty - testState.currentDifficulty));
+                nextQuestion = availableQuestions[0];
+            }
+
+            testState.currentQuestion = nextQuestion;
+        }
+
+        // Parse τα options για να εμφανιστούν
+        const displayQuestion = { ...testState.currentQuestion };
+        displayQuestion.parsedOptions = JSON.parse(displayQuestion.options);
+        // Αν είναι Fill in the Blanks, μετατρέπουμε τα [1] σε HTML Select Dropdowns
+        if (displayQuestion.type === 'fill_blanks') {
+            let htmlText = displayQuestion.question_text;
+            let optionsHtml = '<option value="">-- Επιλέξτε --</option>';
+            displayQuestion.parsedOptions.forEach(opt => {
+                optionsHtml += `<option value="${opt}">${opt}</option>`;
+            });
+            // Αντικαθιστά τα [1], [2] με <select name="answer_1"> κλπ
+            htmlText = htmlText.replace(/\[(\d+)\]/g, (match, p1) => {
+                return `<select name="answer_${p1}" required style="padding: 5px; border-radius: 4px; background: #333; color: white; border: 1px solid #64ffda; margin: 0 5px;">${optionsHtml}</select>`;
+            });
+            displayQuestion.html_text = htmlText;
+        }
 
         res.render('chapterTest', {
             layout: 'dashboardLayout',
@@ -408,52 +488,94 @@ exports.getChapterTest = async (req, res) => {
             user: req.session.user,
             lessonId,
             chapter,
-            questions: parsedQuestions
+            question: displayQuestion,
+            progressNum: testState.askedQuestionIds.length + 1,
+            targetNum: testState.totalTarget,
+            currentDifficulty: testState.currentDifficulty
         });
+
     } catch (err) {
         console.error("Σφάλμα φόρτωσης τεστ:", err);
         res.status(500).send('Σφάλμα διακομιστή.');
     }
 };
 
-
+// --- POST: Υποβολή ΜΙΑΣ απάντησης ---
 exports.postChapterTest = async (req, res) => {
     const { lessonId, chapterId } = req.params;
-    const studentId = req.session.user.id;
-    const submittedAnswers = req.body; // Έχει τη μορφή { q_1: 'Επιλογή 2', q_5: 'Σωστό' }
-    const db = await initDb();
+    const studentAnswer = req.body.answer; // Τώρα παίρνουμε μία μόνο απάντηση
 
-    try {
-        const questions = await db.all(`SELECT * FROM questions WHERE chapter_id = ?`, [chapterId]);
-
-        let correctCount = 0;
-        const totalQuestions = questions.length;
-
-        // Υπολογισμός Σκορ
-        questions.forEach(q => {
-            const studentAnswer = submittedAnswers[`q_${q.id}`];
-            if (studentAnswer && studentAnswer === q.correct_answer) {
-                correctCount++;
-            }
-        });
-
-        // Περνάει αν έχει γράψει πάνω από 50% (Μπορείς να το αλλάξεις)
-        const passed = (correctCount / totalQuestions) >= 0.5 ? 1 : 0;
-
-        // Αποθήκευση στη Βάση
-        await db.run(`
-            INSERT INTO test_results (student_id, chapter_id, score, total_questions, passed)
-            VALUES (?, ?, ?, ?, ?)
-        `,[studentId, chapterId, correctCount, totalQuestions, passed]);
-
-        // Επιστροφή στη σελίδα του μαθήματος για να δει το σκορ του
-        res.redirect(`/lessons/${lessonId}/view`);
-    } catch (err) {
-        console.error("Σφάλμα βαθμολόγησης:", err);
-        res.status(500).send('Σφάλμα κατά την υποβολή.');
+    const testState = req.session.currentTest;
+    if (!testState || !testState.currentQuestion) {
+        return res.redirect(`/lessons/${lessonId}/chapters/${chapterId}/test?start=true`);
     }
-};
 
+    const currentQuestion = testState.currentQuestion;
+
+// --- Έλεγχος Απάντησης βάσει Τύπου ---
+    let isCorrect = false;
+    let studentAnswerText = ""; // Για να σωθεί στο Ιστορικό Λαθών
+
+    if (currentQuestion.type === 'multiple_choice' || currentQuestion.type === 'true_false') {
+        studentAnswerText = req.body.answer;
+        isCorrect = (studentAnswerText === currentQuestion.correct_answer);
+    }
+    else if (currentQuestion.type === 'open_ended') {
+        studentAnswerText = req.body.answer || '';
+        try {
+            // Ελέγχει την απάντηση με το Regex του καθηγητή (αγνοώντας κεφαλαία/μικρά με το 'i')
+            const regex = new RegExp(`^${currentQuestion.correct_answer}$`, 'i');
+            isCorrect = regex.test(studentAnswerText.trim());
+        } catch(e) {
+            // Fallback σε απλό text match αν το regex είναι σπασμένο
+            isCorrect = (studentAnswerText.trim().toLowerCase() === currentQuestion.correct_answer.toLowerCase());
+        }
+    }
+    else if (currentQuestion.type === 'fill_blanks') {
+        const correctObj = JSON.parse(currentQuestion.correct_answer);
+        let studentObj = {};
+        isCorrect = true; // Υποθέτουμε ότι είναι σωστό, και αν βρούμε λάθος το κάνουμε false
+
+        for (let key in correctObj) {
+            const submitted = req.body[`answer_${key}`];
+            studentObj[key] = submitted;
+            if (submitted !== correctObj[key]) {
+                isCorrect = false;
+            }
+        }
+        studentAnswerText = JSON.stringify(studentObj); // Αποθήκευση ιστορικού
+    }
+
+    // --- Αποθήκευση Λεπτομερειών της απάντησης στο Ιστορικό του Session ---
+
+    if (!testState.history) testState.history =[];
+    testState.history.push({
+        question_text: currentQuestion.question_text,
+        student_answer: studentAnswer || 'Δεν απάντησε',
+        correct_answer: currentQuestion.correct_answer,
+        isCorrect: isCorrect,
+        difficulty: currentQuestion.difficulty
+    });
+
+
+    if (isCorrect) {
+        testState.correctAnswers += 1;
+        // Ανέβασμα δυσκολίας (Μέγιστο 5)
+        testState.currentDifficulty = Math.min(5, testState.currentDifficulty + 1);
+    } else {
+        // Κατέβασμα δυσκολίας (Ελάχιστο 1)
+        testState.currentDifficulty = Math.max(1, testState.currentDifficulty - 1);
+    }
+
+    // Καταγραφή ότι η ερώτηση απαντήθηκε και καθαρισμός για την επόμενη
+    testState.askedQuestionIds.push(currentQuestion.id);
+    testState.currentQuestion = null;
+
+    // Αποθήκευση στο Session και reload τη σελίδα (η GET θα βρει την επόμενη)
+    req.session.save(() => {
+        res.redirect(`/lessons/${lessonId}/chapters/${chapterId}/test`);
+    });
+};
 
 exports.getLessonStudents = async (req, res) => {
     const lessonId = req.params.id;
@@ -477,12 +599,30 @@ exports.getLessonStudents = async (req, res) => {
             student.chapterResults =[];
 
             for (let chapter of chapters) {
+                // ΝΕΟ SELECT: Φέρνουμε ΚΑΙ το πεδίο details
                 const result = await db.get(`
-                    SELECT score, total_questions, passed 
-                    FROM test_results 
-                    WHERE student_id = ? AND chapter_id = ? 
+                    SELECT id, score, total_questions, passed, details
+                    FROM test_results
+                    WHERE student_id = ? AND chapter_id = ?
                     ORDER BY completed_at DESC LIMIT 1
                 `, [student.id, chapter.id]);
+
+                // --- Λογική δημιουργίας κειμένου για το Hover (Tooltip) ---
+                let hoverText = "";
+                if (result && result.details) {
+                    try {
+                        const parsedDetails = JSON.parse(result.details);
+                        // Φτιάχνουμε ένα string για κάθε ερώτηση του τεστ
+                        hoverText = parsedDetails.map((d, index) => {
+                            const status = d.isCorrect ? 'Σωστό' : 'Λάθος';
+                            return `Ερ. ${index + 1}: ${d.question_text}\nΑπάντηση: ${d.student_answer}\nΣωστή: ${d.correct_answer}\n[${status} - Δυσκολία: ${d.difficulty}]`;
+                        }).join('\n\n'); // Αφήνουμε μια κενή γραμμή ανάμεσα στις ερωτήσεις
+                    } catch (e) {
+                        hoverText = "Οι λεπτομέρειες δεν είναι διαθέσιμες.";
+                    }
+                } else if (result) {
+                    hoverText = "Δεν καταγράφηκε ιστορικό για αυτό το τεστ.";
+                }
 
                 student.chapterResults.push({
                     chapterTitle: chapter.title,
@@ -490,7 +630,8 @@ exports.getLessonStudents = async (req, res) => {
                     hasAttempted: !!result,
                     passed: result ? result.passed : false,
                     score: result ? result.score : 0,
-                    total: result ? result.total_questions : 0
+                    total: result ? result.total_questions : 0,
+                    detailsText: hoverText // Το περνάμε στο HBS για να μπει στο title!
                 });
             }
         }
@@ -509,3 +650,77 @@ exports.getLessonStudents = async (req, res) => {
         res.status(500).send('Σφάλμα διακομιστή.');
     }
 };
+
+// --- POST: Διαγραφή Ερώτησης ---
+exports.postDeleteQuestion = async (req, res) => {
+    const { lessonId, questionId } = req.params;
+    const db = await initDb();
+    try {
+        await db.run(`DELETE FROM questions WHERE id = ?`, [questionId]);
+        res.redirect(`/lessons/manage/${lessonId}`);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Σφάλμα κατά τη διαγραφή της ερώτησης.');
+    }
+};
+
+// --- GET: Φόρμα Επεξεργασίας Ερώτησης ---
+exports.getEditQuestion = async (req, res) => {
+    const { lessonId, chapterId, questionId } = req.params;
+    const db = await initDb();
+    try {
+        const question = await db.get(`SELECT * FROM questions WHERE id = ?`, [questionId]);
+        if (!question) return res.status(404).send('Not found');
+
+        question.parsedOptions = JSON.parse(question.options);
+
+        res.render('editQuestion', {
+            layout: 'dashboardLayout',
+            title: 'Επεξεργασία Ερώτησης',
+            style: 'manage-lesson.css',
+            user: req.session.user,
+            lessonId, chapterId, question
+        });
+    } catch (err) {
+        res.status(500).send('Σφάλμα διακομιστή');
+    }
+};
+
+// --- POST: Αποθήκευση Επεξεργασίας Ερώτησης ---
+exports.postEditQuestion = async (req, res) => {
+    const { lessonId, questionId } = req.params;
+    const { question_text, difficulty } = req.body;
+    const db = await initDb();
+    try {
+        // Προς το παρόν ενημερώνουμε μόνο Κείμενο και Δυσκολία για αποφυγή πολυπλοκότητας (Μπορείς να το επεκτείνεις!)
+        await db.run(`UPDATE questions SET question_text = ?, difficulty = ? WHERE id = ?`,[question_text, difficulty, questionId]);
+        res.redirect(`/lessons/manage/${lessonId}`);
+    } catch (err) {
+        res.status(500).send('Σφάλμα');
+    }
+};
+
+// --- ΒΟΗΘΗΤΙΚΗ ΣΥΝΑΡΤΗΣΗ: Τερματισμός Τεστ και Αποθήκευση ---
+async function finishTestAndSave(req, res, db, testState) {
+    const studentId = req.session.user.id;
+    const totalAsked = testState.askedQuestionIds.length;
+    const passed = (testState.correctAnswers / totalAsked) >= 0.5 ? 1 : 0;
+
+    // Μετατρέπουμε το ιστορικό σε String
+    const detailsJson = JSON.stringify(testState.history ||[]);
+
+    try {
+        await db.run(`
+            INSERT INTO test_results (student_id, chapter_id, score, total_questions, passed, details)
+            VALUES (?, ?, ?, ?, ?, ?)
+        `,[studentId, testState.chapterId, testState.correctAnswers, totalAsked, passed, detailsJson]);
+
+        req.session.currentTest = null;
+        req.session.save(() => {
+            res.redirect(`/lessons/${testState.lessonId}/view`);
+        });
+    } catch (error) {
+        console.error("Σφάλμα αποθήκευσης αποτελεσμάτων:", error);
+        res.status(500).send("Σφάλμα αποθήκευσης.");
+    }
+}

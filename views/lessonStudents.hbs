@@ -32,11 +32,11 @@
                                 <!-- Εμφάνιση Badges για κάθε κεφάλαιο -->
                                 <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                                     {{#each this.chapterResults}}
-                                        <div title="{{this.chapterTitle}}" style="padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; border: 1px solid #444;
+                                        <div title="{{this.detailsText}}" style="padding: 6px 10px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; border: 1px solid #444; cursor: help;
                                             {{#if this.hasAttempted}}
                                                 {{#if this.passed}}background-color: rgba(76, 175, 80, 0.2); color: #4caf50; border-color: #4caf50;
                                                 {{else}}background-color: rgba(244, 67, 54, 0.2); color: #f44336; border-color: #f44336;{{/if}}
-                                            {{else}}background-color: #222; color: #666;{{/if}}">
+                                            {{else}}background-color: #222; color: #666; cursor: default;{{/if}}">
 
                                             Κεφ. {{this.order_num}}:
                                             {{#if this.hasAttempted}}

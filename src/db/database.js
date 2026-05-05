@@ -58,7 +58,7 @@ async function database() {
                                                  id INTEGER PRIMARY KEY AUTOINCREMENT,
                                                  chapter_id INTEGER,
                                                  question_text TEXT NOT NULL,
-                                                 type TEXT CHECK(type IN ('multiple_choice', 'text_input', 'matching')),
+                                                 type TEXT CHECK(type IN ('multiple_choice', 'text_input', 'matching', 'true_false', 'open_ended', 'fill_blanks')),
                                                  difficulty INTEGER CHECK(difficulty BETWEEN 1 AND 5), -- 1: Εύκολο, 5: Πολύ Δύσκολο
                                                  correct_answer TEXT,
                                                  options TEXT, -- Εδώ αποθηκεύουμε τις επιλογές σε μορφή JSON string
@@ -80,6 +80,7 @@ async function database() {
 `);
 
 
+    // Πίνακας Αποτελεσμάτων Τεστ
     await db.exec(`
         CREATE TABLE IF NOT EXISTS test_results (
                                                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -88,11 +89,14 @@ async function database() {
                                                     score INTEGER NOT NULL,
                                                     total_questions INTEGER NOT NULL,
                                                     passed BOOLEAN DEFAULT 0,
+                                                    details TEXT, -- ΝΕΟ ΠΕΔΙΟ: Εδώ θα μπαίνει το ιστορικό του Τεστ (JSON)
                                                     completed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                                                     FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
                                                     FOREIGN KEY (chapter_id) REFERENCES chapters(id) ON DELETE CASCADE
         )
     `);
+
+
 
     return db;
 }

@@ -48,4 +48,11 @@ router.post('/:lessonId/chapters/:chapterId/test', isLoggedIn, lessonController.
 // Προβολή των φοιτητών και βαθμολογιών για ένα μάθημα
 router.get('/manage/:id/students', isLoggedIn, isStaff, lessonController.getLessonStudents);
 
+// Διαγραφή Ερώτησης
+router.post('/manage/:lessonId/chapters/:chapterId/questions/:questionId/delete', isLoggedIn, isStaff, lessonController.postDeleteQuestion);
+
+// Επεξεργασία Ερώτησης (Θα τα αφήσουμε έτοιμα για μελλοντική χρήση)
+router.get('/manage/:lessonId/chapters/:chapterId/questions/:questionId/edit', isLoggedIn, isStaff, lessonController.getEditQuestion);
+router.post('/manage/:lessonId/chapters/:chapterId/questions/:questionId/edit', isLoggedIn, isStaff, lessonController.postEditQuestion);
+
 module.exports = router;

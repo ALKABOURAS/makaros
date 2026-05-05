@@ -50,17 +50,20 @@
                                     {{#if this.questions.length}}
                                         {{#each this.questions}}
                                             <div class="question-item">
-                                                <div class="q-header">
-                                                    <strong>Ερώτηση:</strong> {{this.question_text}}
-                                                    <span class="diff-badge diff-{{this.difficulty}}">Δυσκολία: {{this.difficulty}}/5</span>
-                                                </div>
 
-                                                <div class="q-options">
-                                                    {{#each this.parsedOptions}}
-                                                        <span class="q-opt {{#if (eq this ../this.correct_answer)}}correct{{/if}}">
-                                                            {{this}}
-                                                        </span>
-                                                    {{/each}}
+                                                <div class="q-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                                    <div>
+                                                        <strong>Ερώτηση:</strong> {{this.question_text}}
+                                                        <span class="diff-badge diff-{{this.difficulty}}">Δυσκολία: {{this.difficulty}}/5</span>
+                                                    </div>
+                                                    <div style="display: flex; gap: 10px;">
+                                                        <!-- Επεξεργασία -->
+                                                        <a href="/lessons/manage/{{../../lesson.id}}/chapters/{{../this.id}}/questions/{{this.id}}/edit" style="text-decoration: none;" title="Επεξεργασία">✏️</a>
+                                                        <!-- Διαγραφή -->
+                                                        <form action="/lessons/manage/{{../../lesson.id}}/chapters/{{../this.id}}/questions/{{this.id}}/delete" method="POST" style="display:inline;" onsubmit="return confirm('Διαγραφή ερώτησης;');">
+                                                            <button type="submit" style="background:none; border:none; cursor:pointer;" title="Διαγραφή">🗑️</button>
+                                                        </form>
+                                                    </div>
                                                 </div>
                                             </div>
                                         {{/each}}
@@ -85,6 +88,8 @@
                                                 <select name="type" required onchange="toggleQuestionFields(this, '{{this.id}}')">
                                                     <option value="multiple_choice">Πολλαπλής Επιλογής</option>
                                                     <option value="true_false">Σωστό / Λάθος</option>
+                                                    <option value="open_ended">Ανοιχτή (Έλεγχος με Regex)</option>
+                                                    <option value="fill_blanks">Συμπλήρωση Κενών</option>
                                                 </select>
                                             </div>
                                             <div class="form-group" style="flex: 1;">
@@ -92,15 +97,15 @@
                                                 <select name="difficulty" required>
                                                     <option value="1">1 - Πολύ Εύκολη</option>
                                                     <option value="2">2 - Εύκολη</option>
-                                                    <option value="3">3 - Μέτρια</option>
+                                                    <option value="3" selected>3 - Μέτρια</option>
                                                     <option value="4">4 - Δύσκολη</option>
                                                     <option value="5">5 - Απαιτητική</option>
                                                 </select>
                                             </div>
                                         </div>
 
-                                        <!-- Πεδία για Multiple Choice -->
-                                        <div id="mc-fields-{{this.id}}">
+                                        <!-- ΠΕΔΙΑ ΠΟΛΛΑΠΛΗΣ -->
+                                        <div id="mc-fields-{{this.id}}" class="q-type-fields">
                                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                                                 <input type="text" name="opt1" placeholder="Επιλογή 1">
                                                 <input type="text" name="opt2" placeholder="Επιλογή 2">
@@ -110,22 +115,43 @@
                                             <div class="form-group" style="margin-top: 10px;">
                                                 <label>Σωστή Επιλογή</label>
                                                 <select name="correct_option_index">
-                                                    <option value="1">Επιλογή 1</option>
-                                                    <option value="2">Επιλογή 2</option>
-                                                    <option value="3">Επιλογή 3</option>
-                                                    <option value="4">Επιλογή 4</option>
+                                                    <option value="1">Επιλογή 1</option><option value="2">Επιλογή 2</option>
+                                                    <option value="3">Επιλογή 3</option><option value="4">Επιλογή 4</option>
                                                 </select>
                                             </div>
                                         </div>
 
-                                        <!-- Πεδία για True/False (Κρυμμένα αρχικά) -->
-                                        <div id="tf-fields-{{this.id}}" style="display: none;">
+                                        <!-- ΠΕΔΙΑ ΣΩΣΤΟ/ΛΑΘΟΣ -->
+                                        <div id="tf-fields-{{this.id}}" class="q-type-fields" style="display: none;">
                                             <div class="form-group" style="margin-top: 10px;">
-                                                <label>Ποια είναι η Σωστή Απάντηση;</label>
+                                                <label>Σωστή Απάντηση</label>
                                                 <select name="tf_correct_answer">
-                                                    <option value="Σωστό">Σωστό</option>
-                                                    <option value="Λάθος">Λάθος</option>
+                                                    <option value="true">Σωστό</option>
+                                                    <option value="false">Λάθος</option>
                                                 </select>
+                                            </div>
+                                        </div>
+
+                                        <!-- ΠΕΔΙΑ ΑΝΟΙΧΤΗΣ ΕΡΩΤΗΣΗΣ -->
+                                        <div id="oe-fields-{{this.id}}" class="q-type-fields" style="display: none;">
+                                            <div class="form-group" style="margin-top: 10px;">
+                                                <label>Αποδεκτή Απάντηση (Απλή λέξη ή Regex Pattern)</label>
+                                                <input type="text" name="regex_answer" placeholder="π.χ. Αθήνα (ή ^(Αθήνα|ΑΘΗΝΑ)$ )">
+                                                <small style="color: #888;">Ο έλεγχος δεν κάνει διάκριση πεζών/κεφαλαίων αυτόματα.</small>
+                                            </div>
+                                        </div>
+
+                                        <!-- ΠΕΔΙΑ ΣΥΜΠΛΗΡΩΣΗΣ ΚΕΝΩΝ -->
+                                        <div id="fb-fields-{{this.id}}" class="q-type-fields" style="display: none;">
+                                            <p style="font-size: 0.85rem; color: #a8b1ff;">Οδηγία: Στην Εκφώνηση παραπάνω χρησιμοποιήστε [1], [2], [3] για τα κενά.</p>
+                                            <div class="form-group">
+                                                <label>Λέξεις (Χωρισμένες με κόμμα - Σωστές & Λάθος)</label>
+                                                <input type="text" name="fb_options" placeholder="π.χ. Αθήνα, Παρίσι, Ρώμη, Λονδίνο">
+                                            </div>
+                                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                                                <div><label>Κενό [1]</label><input type="text" name="fb_correct_1" placeholder="Σωστή Λέξη 1"></div>
+                                                <div><label>Κενό [2]</label><input type="text" name="fb_correct_2" placeholder="Σωστή Λέξη 2"></div>
+                                                <div><label>Κενό [3]</label><input type="text" name="fb_correct_3" placeholder="Σωστή Λέξη 3"></div>
                                             </div>
                                         </div>
 
@@ -168,21 +194,19 @@
 </div>
 
 <script>
-    function toggleQuestionFields(selectElement, chapterId) {
-        const mcFields = document.getElementById('mc-fields-' + chapterId);
-        const tfFields = document.getElementById('tf-fields-' + chapterId);
+        function toggleQuestionFields(selectElement, chapterId) {
+        const val = selectElement.value;
+        // Κρύβουμε όλα
+        document.getElementById('mc-fields-' + chapterId).style.display = 'none';
+        document.getElementById('tf-fields-' + chapterId).style.display = 'none';
+        document.getElementById('oe-fields-' + chapterId).style.display = 'none';
+        document.getElementById('fb-fields-' + chapterId).style.display = 'none';
 
-        if (selectElement.value === 'multiple_choice') {
-            mcFields.style.display = 'block';
-            tfFields.style.display = 'none';
-            // Προσθήκη required
-            mcFields.querySelectorAll('input').forEach(i => i.setAttribute('required', 'true'));
-        } else {
-            mcFields.style.display = 'none';
-            tfFields.style.display = 'block';
-            // Αφαίρεση required
-            mcFields.querySelectorAll('input').forEach(i => i.removeAttribute('required'));
-        }
+        // Εμφανίζουμε το σωστό
+        if (val === 'multiple_choice') document.getElementById('mc-fields-' + chapterId).style.display = 'block';
+        if (val === 'true_false') document.getElementById('tf-fields-' + chapterId).style.display = 'block';
+        if (val === 'open_ended') document.getElementById('oe-fields-' + chapterId).style.display = 'block';
+        if (val === 'fill_blanks') document.getElementById('fb-fields-' + chapterId).style.display = 'block';
     }
     // Αρχικοποίηση κατά το φόρτωμα (να είναι required τα inputs του multiple choice)
     document.addEventListener('DOMContentLoaded', () => {
